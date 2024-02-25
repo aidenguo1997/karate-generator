@@ -2,11 +2,11 @@
   {
     "path": "/tmall/register/doRegister",
     "method": "POST",
-    "request_text": "user_name=z123&user_password=cd069798&user_nickname=bbb&user_birthday=2023-12-05&user_gender=0&user_address=140581"
+    "request_text": "user_name=s5678&user_password=zxc123321&user_nickname=bbb&user_birthday=2023-12-05&user_gender=0&user_address=140581"
   },
   {
     "path": "/tmall/login/doLogin",
     "method": "POST",
-    "request_text": "username=z123&password=cd069798"
+    "request_text": "username=s5678&password=zxc123321"
   }
 ]

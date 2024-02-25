@@ -7,7 +7,7 @@
 		"version": "Ver. 1.0.2"
 	},
 	"servers": [{
-		"url": "http://localhost:8080/tmall",
+		"url": "https://tmall.up.railway.app/tmall",
 		"description": "Generated server url"
 	}],
 	"security": [{

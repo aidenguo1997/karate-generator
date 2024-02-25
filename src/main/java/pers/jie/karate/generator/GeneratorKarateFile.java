@@ -1,4 +1,4 @@
-package org.example;
+package pers.jie.karate.generator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class KarateGherkinGenerator {
+public class GeneratorKarateFile {
     public static void main(String[] args) {
-        convertGherkinToKarate("src/main/resources/Features/uiTest.feature", "src/main/resources/Swaggers/sojson.com.json", "src/main/resources/Data/captured_data.json");
+        convertGherkinToKarate("src/test/resources/Features/uiTest.feature", "src/main/resources/Swaggers/sojson.com.json", "src/main/resources/Data/captured_data.json");
     }
 
     public static void convertGherkinToKarate(String gherkinPath, String swaggerPath, String jsonFilePath) {
@@ -47,7 +47,7 @@ public class KarateGherkinGenerator {
 
     private static void writeKarateScriptToFile(String karateScript) {
         try {
-            Path path = Path.of("src/main/resources/Features/karate-script.feature");
+            Path path = Path.of("src/test/java/pers/jie/karate/api/karate-script.feature");
             Files.write(path, karateScript.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             System.out.println("Karate script written to: " + path.toAbsolutePath());
         } catch (Exception e) {
@@ -62,6 +62,9 @@ public class KarateGherkinGenerator {
         String swaggerTitle = openAPI.getInfo().getTitle();
         // Feature declaration outside the loop
         karateScript.append(String.format("Feature: %s\n", swaggerTitle));
+        // Background declaration
+        karateScript.append("Background:\n");
+        karateScript.append(String.format("  * url '%s'\n", openAPI.getServers().get(0).getUrl())); // Adding the base URL
         // Loop through paths
         for (Map.Entry<String, PathItem> pathEntry : openAPI.getPaths().entrySet()) {
             String path = pathEntry.getKey();
@@ -84,8 +87,8 @@ public class KarateGherkinGenerator {
                         continue;
                     }
                     karateScript.append(String.format("\n  Scenario: %s\n", operation.getDescription()));
-                    karateScript.append(String.format("    Given url '%s'\n", openAPI.getServers().get(0).getUrl())); // Adding the base URL
-                    karateScript.append(String.format("    And path '%s'\n", path));
+                    //karateScript.append(String.format("    Given url '%s'\n", openAPI.getServers().get(0).getUrl())); // Adding the base URL
+                    karateScript.append(String.format("    Given path '%s'\n", path));
 
                     // Handle request body if present
                     if (operation.getParameters() != null) {
@@ -98,17 +101,27 @@ public class KarateGherkinGenerator {
                             // 从当前路径中提取路径的末尾部分，并将路径转换为小写
                             String normalizedPath = path.replaceAll(".*/", "").toLowerCase();
                             if (normalizedRequestPath.equals(normalizedPath) && requestData.get("method").equals(httpMethod.name())) {
-                                String requestText = requestData.get("request_text");
-                                // 将键值对形式的字符串转换为 JSON 对象
-                                ObjectNode jsonRequest = new ObjectMapper().createObjectNode();
-                                String[] keyValuePairs = requestText.split("&");
-                                for (String pair : keyValuePairs) {
-                                    String[] parts = pair.split("=");
-                                    if (parts.length == 2) {
-                                        jsonRequest.put(parts[0], parts[1]);
+                                String requestText  = requestData.get("request_text");
+                                // 检查参数的 'in' 属性是否为 'query'，如果是，则解析成 'And param'，否则解析成 'And request'
+                                if ("query".equals(operation.getParameters().get(0).getIn())) {
+                                    String[] keyValuePairs = requestText.split("&");
+                                    for (String pair : keyValuePairs) {
+                                        String[] parts = pair.split("=");
+                                        if (parts.length == 2) {
+                                            karateScript.append(String.format("    And param %s = '%s'\n", parts[0], parts[1]));
+                                        }
                                     }
+                                } else {
+                                    ObjectNode jsonRequest = new ObjectMapper().createObjectNode();
+                                    String[] keyValuePairs = requestText.split("&");
+                                    for (String pair : keyValuePairs) {
+                                        String[] parts = pair.split("=");
+                                        if (parts.length == 2) {
+                                            jsonRequest.put(parts[0], parts[1]);
+                                        }
+                                    }
+                                    karateScript.append(String.format("    And request %s\n", jsonRequest.toString()));
                                 }
-                                karateScript.append(String.format("    And request %s\n", jsonRequest.toString()));
                                 break;
                             }
                         }
