@@ -11,4 +11,3 @@ Feature: Testing Tmall Store web UI
     #api_S2
     When the user enters account and password
     Then the user will jump to the Tmall homepage
-

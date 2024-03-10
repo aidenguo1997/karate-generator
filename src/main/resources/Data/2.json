@@ -1,0 +1,12 @@
+[
+  {
+    "path": "/tmall/login/doLogin",
+    "method": "POST",
+    "request_text": "username=s5678&password=zxc123321"
+  },
+  {
+    "path": "/tmall/user/update",
+    "method": "POST",
+    "request_text": "user_profile_picture_src=&user_nickname=Alean&user_realname=Guo+Jie&user_password=zxc123321&user_password_one=zxc123321&user_gender=1&user_birthday=2023-11-29&user_address=220421"
+  }
+]
