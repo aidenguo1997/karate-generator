@@ -12,6 +12,11 @@
       "description": "Generated server url"
     }
   ],
+  "security":[
+    {
+      "JWT Authentication":[]
+    }
+  ],
   "tags": [
     {
       "name": "User",
@@ -772,7 +777,7 @@
         "tags": [
           "Login"
         ],
-        "summary": "#login",
+        "summary": "#session",
         "description": "Login",
         "operationId": "checkLogin",
         "parameters": [

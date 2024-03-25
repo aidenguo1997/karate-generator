@@ -1,12 +1,14 @@
 Feature: Tmall Store
   Background:
     * url 'https://tmall.up.railway.app/tmall'
-    #根據Karate規範，如後續Scenario需登入，則Scenario: Login將移入Background
-    Given path '/login/doLogin'
-    And param username = 's5678'
-    And param password = 'zxc123321'
-    When method post
-    Then status 200
+    #依據Karate規範，後續Scenario如需session，則Scenario: Login將移入Background
+    * path '/login/doLogin'
+    * param username = 's5678'
+    * param password = 'zxc123321'
+    * method post
+    * status 200
+    * def token = responseHeaders.token
+    * header Authorization = token
 
   Scenario: User Update
     Given path '/user/update'

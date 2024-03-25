@@ -2,7 +2,7 @@ Feature: Testing Tmall Store web UI
 
   Scenario: Login Tmall
     Given The user is on the Tmall login page
-    #login
+    #session
     When the user enters account and password
     Then the user will jump to the Tmall homepage
 
