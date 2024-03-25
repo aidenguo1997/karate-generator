@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GeneratorBackgroundScript {
-    public StringBuilder generateBackgroundKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList) {
+    public static StringBuilder generateBackgroundKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList) {
         StringBuilder karateScript = new StringBuilder();
         List<String> errors = new ArrayList<>();
         // Get title from Swagger info
@@ -27,15 +27,8 @@ public class GeneratorBackgroundScript {
             PathItem pathItem = pathEntry.getValue();
             // Loop through operations for each path
             pathItem.readOperationsMap().forEach((httpMethod, operation) -> {
-                if (operation.getSummary() == null) {
-                    errors.add("Operation summary is null for path: " + path + ", HTTP method: " + httpMethod);
-                    return; // Skip this operation if summary is null
-                }
-                String gherkinTag = new GherkinTag().getMatchingGherkinTag(gherkinContent, operation.getSummary());
-                if (gherkinTag == null) {
-                    errors.add(String.format("No matching Gherkin tag found for Swagger operation summary '%s'", operation.getSummary()));
-                    return; // Skip this operation if no matching Gherkin tag found
-                }
+                String gherkinTag = GherkinTag.getGherkinTag(gherkinContent, httpMethod, operation, errors, path);
+                if (gherkinTag == null) return;
                 handleOperation(openAPI, karateScript, path, operation, gherkinTag, requestDataList, httpMethod.name());
             });
         }
@@ -47,7 +40,7 @@ public class GeneratorBackgroundScript {
         return karateScript;
     }
 
-    private void handleOperation(OpenAPI openAPI, StringBuilder karateScript, String path, Operation operation, String gherkinTag, List<Map<String, String>> requestDataList, String httpMethod) {
+    private static void handleOperation(OpenAPI openAPI, StringBuilder karateScript, String path, Operation operation, String gherkinTag, List<Map<String, String>> requestDataList, String httpMethod) {
         if (gherkinTag.equals("#session")) {
             karateScript.append(String.format("    #依據Karate規範，後續Scenario如需session，則Scenario: %s將移入Background\n", operation.getDescription()));
             karateScript.append(String.format("    * path '%s'\n", path));
