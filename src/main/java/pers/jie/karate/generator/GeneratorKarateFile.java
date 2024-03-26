@@ -14,18 +14,18 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 
-public class GeneratorKarateFile {
-    private static final String KARATE_SCRIPT_PATH = "src/test/java/pers/jie/karate/api/karate-script.feature";
+import static pers.jie.karate.generator.FilePath.*;
 
+public class GeneratorKarateFile {
     public static void main(String[] args) {
-        convertGherkinToKarate("src/test/resources/Features/2.feature", "src/main/resources/Swaggers/2.json", "src/main/resources/Data/2.json");
+        convertGherkinToKarate();
     }
 
-    public static void convertGherkinToKarate(String gherkinPath, String swaggerPath, String jsonFilePath) {
+    private static void convertGherkinToKarate() {
         try {
-            String gherkinContent = readFileContent(gherkinPath);
-            OpenAPI openAPI = parseSwagger(swaggerPath);
-            List<Map<String, String>> requestDataList = readRequestData(jsonFilePath);
+            String gherkinContent = readFileContent();
+            OpenAPI openAPI = parseSwagger();
+            List<Map<String, String>> requestDataList = readRequestData();
             StringBuilder karateScript = generateKarateScript(openAPI, gherkinContent, requestDataList);
             writeKarateScriptToFile(karateScript);
         } catch (Exception e) {
@@ -33,18 +33,18 @@ public class GeneratorKarateFile {
         }
     }
 
-    private static String readFileContent(String filePath) throws IOException {
-        return Files.readString(Path.of(filePath));
+    private static String readFileContent() throws IOException {
+        return Files.readString(Path.of(GHERKIN_PATH));
     }
 
-    private static OpenAPI parseSwagger(String swaggerPath) {
-        SwaggerParseResult parseResult = new OpenAPIV3Parser().readLocation(swaggerPath, null, null);
+    private static OpenAPI parseSwagger() {
+        SwaggerParseResult parseResult = new OpenAPIV3Parser().readLocation(SWAGGER_PATH, null, null);
         return parseResult.getOpenAPI();
     }
 
-    private static List<Map<String, String>> readRequestData(String jsonFilePath) throws IOException {
+    private static List<Map<String, String>> readRequestData() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(new File(jsonFilePath), new TypeReference<>() {
+        return objectMapper.readValue(new File(REQUEST_DATA_PATH), new TypeReference<>() {
         });
     }
 
