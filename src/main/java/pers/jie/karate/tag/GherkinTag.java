@@ -1,4 +1,4 @@
-package pers.jie.karate.generator;
+package pers.jie.karate.tag;
 
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -6,7 +6,7 @@ import io.swagger.v3.oas.models.PathItem;
 import java.util.List;
 
 public class GherkinTag {
-    public static String getGherkinTag(String gherkinContent, PathItem.HttpMethod httpMethod, Operation operation, List<String> errors, String path) {
+    public String getGherkinTag(String gherkinContent, PathItem.HttpMethod httpMethod, Operation operation, List<String> errors, String path) {
         if (operation.getSummary() == null) {
             errors.add("Operation summary is null for path: " + path + ", HTTP method: " + httpMethod);
             return null; // Skip this operation if summary is null
@@ -19,7 +19,7 @@ public class GherkinTag {
         return gherkinTag;
     }
 
-    private static String getMatchingGherkinTag(String gherkinContent, String summary) {
+    private String getMatchingGherkinTag(String gherkinContent, String summary) {
         String[] lines = gherkinContent.split("\n");
         for (String line : lines) {
             String trimmedLine = line.trim();
