@@ -3,12 +3,22 @@ package pers.jie.karate;
 import pers.jie.karate.core.HandleOperation;
 import pers.jie.karate.generator.GeneratorKarateFile;
 import pers.jie.karate.generator.GeneratorScript;
+import pers.jie.karate.tag.GherkinTag;
+
+import java.util.List;
+import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
-        HandleOperation handleOperation = new HandleOperation();
+        GherkinTag gherkinTag = new GherkinTag();
+        HandleOperation handleOperation = new HandleOperation(gherkinTag);
         GeneratorScript generatorScript = new GeneratorScript(handleOperation);
-        GeneratorKarateFile generator = new GeneratorKarateFile(generatorScript);
-        generator.convertGherkinToKarate();
+        GeneratorKarateFile generatorKarateFile = new GeneratorKarateFile(generatorScript);
+        List<String> errors = new ArrayList<>();
+        generatorKarateFile.convertGherkinToKarate(errors);
+        if (!errors.isEmpty()) {
+            System.out.println("Errors encountered:");
+            errors.forEach(System.out::println);
+        }
     }
 }

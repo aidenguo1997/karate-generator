@@ -5,22 +5,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
-import pers.jie.karate.tag.GherkinTag;
 import pers.jie.karate.param.KarateSyntaxParam;
+import pers.jie.karate.tag.GherkinTag;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class HandleOperation {
 
-    public void handleOperation(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, boolean isBackground, StringBuilder karateScript) {
-        // 参数验证
-        if (openAPI == null || gherkinContent == null || requestDataList == null || karateScript == null) {
-            throw new IllegalArgumentException("Parameters cannot be null");
-        }
+    private final GherkinTag gherkinTag;
 
-        List<String> errors = new ArrayList<>();
+    public HandleOperation(GherkinTag gherkinTag) {
+        this.gherkinTag = gherkinTag;
+    }
+
+    public void handleOperation(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, boolean isBackground, StringBuilder karateScript, List<String> errors) {
+        // 参数验证
+        assertParametersNotNull(openAPI, gherkinContent, requestDataList, karateScript);
         // Get title from Swagger info
         String swaggerTitle = openAPI.getInfo().getTitle();
         // Background declaration if it is a background script
@@ -36,8 +38,9 @@ public class HandleOperation {
             PathItem pathItem = pathEntry.getValue();
             // Loop through operations for each path
             pathItem.readOperationsMap().forEach((httpMethod, operation) -> {
-                String gherkinTag = new GherkinTag().getGherkinTag(gherkinContent, httpMethod, operation, errors, path);
-                if ((isBackground && gherkinTag != null && gherkinTag.equals("#session")) || (!isBackground && gherkinTag != null && !gherkinTag.equals("#session"))) {
+                Optional<String> tag = gherkinTag.getGherkinTag(gherkinContent, httpMethod, operation, errors, path);
+                boolean isSession = gherkinTag.isSessionTag(gherkinContent, httpMethod, operation, errors, path);
+                if ((isBackground == isSession) && tag.isPresent()) {
                     if (isBackground) {
                         karateScript.append(String.format(KarateSyntaxParam.PROMPT, operation.getDescription()));
                         karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.PATH, path));
@@ -63,10 +66,13 @@ public class HandleOperation {
             });
         }
 
-        if (!errors.isEmpty()) {
-            System.out.println("Errors encountered:");
-            errors.forEach(System.out::println);
-        }
+    }
+
+    private void assertParametersNotNull(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, StringBuilder karateScript) {
+        assert openAPI != null : "OpenAPI cannot be null";
+        assert gherkinContent != null : "Gherkin content cannot be null";
+        assert requestDataList != null : "Request data list cannot be null";
+        assert karateScript != null : "Karate script cannot be null";
     }
 
     private void handleOperationParameters(Operation operation, List<Map<String, String>> requestDataList, String path, StringBuilder karateScript, boolean isBackground) {
@@ -89,7 +95,7 @@ public class HandleOperation {
         }
     }
 
-    private void handleQueryParams(StringBuilder karateScript, String requestText, boolean isBackground) {
+    private void handleRequestParams(StringBuilder karateScript, String requestText, boolean isBackground, boolean isJson) {
         String[] keyValuePairs = requestText.split("&");
         for (String pair : keyValuePairs) {
             String[] parts = pair.split("=");
@@ -101,21 +107,29 @@ public class HandleOperation {
                 }
             }
         }
+
+        if (isJson) {
+            ObjectNode jsonRequest = new ObjectMapper().createObjectNode();
+            for (String pair : keyValuePairs) {
+                String[] parts = pair.split("=");
+                if (parts.length == 2) {
+                    jsonRequest.put(parts[0], parts[1]);
+                }
+            }
+            if (isBackground) {
+                karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.REQUEST, jsonRequest.toString()));
+            } else {
+                karateScript.append(String.format(KarateSyntaxParam.AND + KarateSyntaxParam.REQUEST, jsonRequest.toString()));
+            }
+        }
+    }
+
+    private void handleQueryParams(StringBuilder karateScript, String requestText, boolean isBackground) {
+        handleRequestParams(karateScript, requestText, isBackground, false);
     }
 
     private void handleJsonRequest(StringBuilder karateScript, String requestText, boolean isBackground) {
-        ObjectNode jsonRequest = new ObjectMapper().createObjectNode();
-        String[] keyValuePairs = requestText.split("&");
-        for (String pair : keyValuePairs) {
-            String[] parts = pair.split("=");
-            if (parts.length == 2) {
-                jsonRequest.put(parts[0], parts[1]);
-            }
-        }
-        if (isBackground) {
-            karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.REQUEST, jsonRequest.toString()));
-        } else {
-            karateScript.append(String.format(KarateSyntaxParam.AND + KarateSyntaxParam.REQUEST, jsonRequest.toString()));
-        }
+        handleRequestParams(karateScript, requestText, isBackground, true);
     }
+
 }

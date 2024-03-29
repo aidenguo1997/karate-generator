@@ -7,15 +7,15 @@ import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import pers.jie.karate.param.FilePathParam;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
-import java.io.BufferedReader;
-import java.nio.charset.StandardCharsets;
 
 public class GeneratorKarateFile {
     private final GeneratorScript generatorScript;
@@ -24,15 +24,17 @@ public class GeneratorKarateFile {
         this.generatorScript = generatorScript;
     }
 
-    public void convertGherkinToKarate() {
+    public void convertGherkinToKarate(List<String> errors) {
         try {
             String gherkinContent = readFileContent();
             OpenAPI openAPI = parseSwagger();
             List<Map<String, String>> requestDataList = readRequestData();
-            StringBuilder karateScript = generateKarateScript(openAPI, gherkinContent, requestDataList);
+            StringBuilder karateScript = generateKarateScript(openAPI, gherkinContent, requestDataList, errors);
             writeKarateScriptToFile(karateScript);
+        } catch (IOException e) {
+            errors.add("Error occurred while reading file: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            errors.add("Unexpected error occurred: " + e.getMessage());
         }
     }
 
@@ -58,10 +60,10 @@ public class GeneratorKarateFile {
         });
     }
 
-    private StringBuilder generateKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList) {
+    private StringBuilder generateKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, List<String> errors) {
         StringBuilder karateScript = new StringBuilder();
-        karateScript.append(generatorScript.backgroundKarateScript(openAPI, gherkinContent, requestDataList));
-        karateScript.append(generatorScript.scenarioKarateScript(openAPI, gherkinContent, requestDataList));
+        generatorScript.backgroundKarateScript(openAPI, gherkinContent, requestDataList, errors, karateScript);
+        generatorScript.scenarioKarateScript(openAPI, gherkinContent, requestDataList, errors, karateScript);
         return karateScript;
     }
 

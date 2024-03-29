@@ -9,18 +9,16 @@ import pers.jie.karate.core.HandleOperation;
 
 public class GeneratorScript {
     private final HandleOperation handleOperation;
+
     public GeneratorScript(HandleOperation handleOperation) {
         this.handleOperation = handleOperation;
     }
-    public StringBuilder backgroundKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList) {
-        StringBuilder karateScript = new StringBuilder();
-        handleOperation.handleOperation(openAPI, gherkinContent, requestDataList, true, karateScript);
-        return karateScript;
+
+    public void backgroundKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, List<String> errors, StringBuilder karateScript) {
+        handleOperation.handleOperation(openAPI, gherkinContent, requestDataList, true, karateScript, errors);
     }
 
-    public StringBuilder scenarioKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList) {
-        StringBuilder karateScript = new StringBuilder();
-        handleOperation.handleOperation(openAPI, gherkinContent, requestDataList, false, karateScript);
-        return karateScript;
+    public void scenarioKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, List<String> errors, StringBuilder karateScript) {
+        handleOperation.handleOperation(openAPI, gherkinContent, requestDataList, false, karateScript, errors);
     }
 }
