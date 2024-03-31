@@ -10,7 +10,6 @@ import pers.jie.karate.tag.GherkinTag;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class HandleOperation {
 
@@ -38,9 +37,9 @@ public class HandleOperation {
             PathItem pathItem = pathEntry.getValue();
             // Loop through operations for each path
             pathItem.readOperationsMap().forEach((httpMethod, operation) -> {
-                Optional<String> tag = gherkinTag.getGherkinTag(gherkinContent, httpMethod, operation, errors, path);
-                boolean isSession = gherkinTag.isSessionTag(gherkinContent, httpMethod, operation, errors, path);
-                if ((isBackground == isSession) && tag.isPresent()) {
+                String tag = gherkinTag.getGherkinTag(gherkinContent, httpMethod, operation, errors, path);
+                boolean isSession = gherkinTag.isSessionTag();
+                if ((isBackground == isSession) && tag != null) {
                     if (isBackground) {
                         karateScript.append(String.format(KarateSyntaxParam.PROMPT, operation.getDescription()));
                         karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.PATH, path));
@@ -66,13 +65,6 @@ public class HandleOperation {
             });
         }
 
-    }
-
-    private void assertParametersNotNull(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, StringBuilder karateScript) {
-        assert openAPI != null : "OpenAPI cannot be null";
-        assert gherkinContent != null : "Gherkin content cannot be null";
-        assert requestDataList != null : "Request data list cannot be null";
-        assert karateScript != null : "Karate script cannot be null";
     }
 
     private void handleOperationParameters(Operation operation, List<Map<String, String>> requestDataList, String path, StringBuilder karateScript, boolean isBackground) {
@@ -130,6 +122,13 @@ public class HandleOperation {
 
     private void handleJsonRequest(StringBuilder karateScript, String requestText, boolean isBackground) {
         handleRequestParams(karateScript, requestText, isBackground, true);
+    }
+
+    private void assertParametersNotNull(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, StringBuilder karateScript) {
+        assert openAPI != null : "OpenAPI cannot be null";
+        assert gherkinContent != null : "Gherkin content cannot be null";
+        assert requestDataList != null : "Request data list cannot be null";
+        assert karateScript != null : "Karate script cannot be null";
     }
 
 }

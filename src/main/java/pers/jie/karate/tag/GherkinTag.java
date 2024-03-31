@@ -8,22 +8,24 @@ import java.util.List;
 import java.util.Optional;
 
 public class GherkinTag {
+    private final Tag tag;
 
-    public boolean isSessionTag(String gherkinContent, PathItem.HttpMethod httpMethod, Operation operation, List<String> errors, String path) {
-        return getGherkinTag(gherkinContent, httpMethod, operation, errors, path)
-                .map(tag -> tag.equals(KarateSyntaxParam.SESSION_TAG))
-                .orElse(false);
+    public GherkinTag() {
+        this.tag = new Tag();
     }
 
-    public Optional<String> getGherkinTag(String gherkinContent, PathItem.HttpMethod httpMethod, Operation operation, List<String> errors, String path) {
+    public String getGherkinTag(String gherkinContent, PathItem.HttpMethod httpMethod, Operation operation, List<String> errors, String path) {
         if (operation.getSummary() == null) {
             errors.add("Operation summary is null for path: " + path + ", HTTP method: " + httpMethod);
+            return null;
         }
         Optional<String> gherkinTag = getMatchingGherkinTag(gherkinContent, operation.getSummary());
+        gherkinTag.ifPresent(tag::setTag);
         if (gherkinTag.isEmpty()) {
             errors.add(String.format("No matching Gherkin tag found for Swagger operation summary '%s'", operation.getSummary()));
+            return null;
         }
-        return gherkinTag   ;
+        return tag.getTag();
     }
 
     private Optional<String> getMatchingGherkinTag(String gherkinContent, String summary) {
@@ -38,5 +40,9 @@ public class GherkinTag {
             }
         }
         return Optional.empty();
+    }
+
+    public boolean isSessionTag() {
+        return tag.getTag() != null && tag.getTag().equals(KarateSyntaxParam.SESSION_TAG);
     }
 }
