@@ -4,7 +4,7 @@ Feature: Adapt REST API
     * configure charset = null
     # 依據Karate規範，後續Scenario如需session，則Scenario: Generate Token (Login)Login to the API with your email and password to retrieve an authentication token.將移入Background
     * path '/login'
-    * request {"email":"ab22213395@gmail.com","password":"cd069798"}
+    * request {"email":"ab295@gmail.com","password":"6666666"}
     * method POST
     * status 200
     * def token = response.token
