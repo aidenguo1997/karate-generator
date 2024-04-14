@@ -1,0 +1,12 @@
+[
+  {
+    "path": "/login",
+    "method": "POST",
+    "request_text": "{\"email\":\"ab22213395@gmail.com\",\"password\":\"cd069798\"}"
+  },
+  {
+    "path": "/guilds",
+    "method": "POST",
+    "request_text": "{\"name\":\"aiden777\",\"nonce\":\"10666230188605440\"}"
+  }
+]

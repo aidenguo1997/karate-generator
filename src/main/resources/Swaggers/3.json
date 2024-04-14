@@ -1,0 +1,1610 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Adapt REST API",
+    "description": "Public REST API for the Adapt chat platform",
+    "license": {
+      "name": "AGPL-3.0"
+    },
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.adapt.chat",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/guilds": {
+      "get": {
+        "tags": [
+          "guilds"
+        ],
+        "summary": "Get All Guilds",
+        "description": "Get All Guilds\n\nFetches information for all guilds the user is a member of, abiding by the given query.",
+        "operationId": "get_all_guilds",
+        "parameters": [
+          {
+            "name": "channels",
+            "in": "query",
+            "description": "Whether to resolve the guild's channels in the response.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "members",
+            "in": "query",
+            "description": "Whether to resolve the guild's members in the response.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "roles",
+            "in": "query",
+            "description": "Whether to resolve the guild's roles in the response.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of guild objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Guild"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "guilds"
+        ],
+        "summary": "#api_S1",
+        "description": "Create Guild\n\nCreates a new guild with the given payload.",
+        "operationId": "create_guild",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGuildPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Guild was successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Guild"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "#session",
+        "description": "Generate Token (Login)\n\nLogin to the API with your email and password to retrieve an authentication token.",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Create User",
+        "description": "Create User\n\nRegisters a new user account with the given payload.",
+        "operationId": "create_user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "User ID and token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Username or email is already taken",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateGuildPayload": {
+        "type": "object",
+        "description": "The payload sent to create a new guild.",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "banner": {
+            "type": "string",
+            "description": "The banner URL for the guild. Must be a valid URL, or `None` to not set a banner.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the guild. Must be between 0 and 1000 characters, or `None` for\nno description.",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "description": "The icon for the guild. Must be a valid URL, or `None` to not set an icon. This should be\na [Data URI scheme](https://en.wikipedia.org/wiki/Data_URI_scheme) if provided.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the guild. Must be between 2 and 100 characters."
+          },
+          "nonce": {
+            "type": "string",
+            "description": "A nonce to include with the guild. This is not stored and can be used to identify the\nguild later on (it is relayed through the websocket).",
+            "nullable": true
+          },
+          "public": {
+            "type": "boolean",
+            "description": "Whether the guild should be public or not. Defaults to `false`."
+          }
+        }
+      },
+      "CreateUserPayload": {
+        "type": "object",
+        "description": "Payload sent to create a new user.",
+        "required": [
+          "username",
+          "email",
+          "password",
+          "captcha_token"
+        ],
+        "properties": {
+          "captcha_token": {
+            "type": "string",
+            "description": "Turnstile CAPTCHA response from Cloudflare."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "The global display name of the user. Must be between 2 and 32 characters.",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "The email of the user. Must be a valid email address."
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "The password of the user. Must be between 8 and 32 characters."
+          },
+          "username": {
+            "type": "string",
+            "description": "The unique username of the user. Must between 2 and 32 characters and only contain\nalphanumeric characters, periods (.), hyphens (-), and underscores (_)."
+          }
+        }
+      },
+      "CreateUserResponse": {
+        "type": "object",
+        "description": "Data returned when creating a new user.",
+        "required": [
+          "id",
+          "token"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The ID of the user.",
+            "minimum": 0
+          },
+          "token": {
+            "type": "string",
+            "description": "The token to use for authentication."
+          }
+        }
+      },
+      "Error": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "Received a malformed JSON or MsgPack body.",
+            "required": [
+              "error_type",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "error_type": {
+                "$ref": "#/components/schemas/MalformedBodyErrorType"
+              },
+              "message": {
+                "type": "string",
+                "description": "A generalized message about the error."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "malformed_body"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You are missing the request body in an endpoint that requires it. This is commonly JSON\nor MsgPack.",
+            "required": [
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "missing_body"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Invalid field in the request body.",
+            "required": [
+              "field",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "field": {
+                "type": "string",
+                "description": "The field that failed validation."
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "invalid_field"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You are missing a required field in the request body.",
+            "required": [
+              "field",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "field": {
+                "type": "string",
+                "description": "The name of the missing field."
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "missing_field"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Could not resolve a plausible IP address from the request.",
+            "required": [
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "malformed_ip"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "The entity was not found.",
+            "required": [
+              "entity",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "entity": {
+                "type": "string",
+                "description": "The type of item that couldn't be found."
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "not_found"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Tried authorizing a bot account with anything but an authentication token.",
+            "required": [
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "unsupported_auth_method"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "The request required a valid authentication token, but one of the following happened:\n\n* The token was not provided.\n* The token was malformed, i.e. a non-UTF-8 string.\n* The token does not exist or is invalid.",
+            "required": [
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "invalid_token"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Invalid login credentials were provided, i.e. an invalid password.",
+            "required": [
+              "what",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "invalid_credentials"
+                ]
+              },
+              "what": {
+                "type": "string",
+                "description": "Which credential was invalid."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Invalid Turnstile CAPTCHA token was provided. This is a token provided by Cloudflare\nwhen a user completes a CAPTCHA, and is used while registering new users to prevent spam.",
+            "required": [
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "invalid_captcha"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You must be a member of the guild to perform the requested action.",
+            "required": [
+              "guild_id",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "guild_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the guild you are not a member of.",
+                "minimum": 0
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "not_member"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You must be the owner of the guild to perform the requested action.",
+            "required": [
+              "guild_id",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "guild_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the guild you are not the owner of.",
+                "minimum": 0
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "not_owner"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You are not the author of the message you are trying to edit.",
+            "required": [
+              "message_id",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "message_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the message you are trying to edit.",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "not_message_author"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You are too low in the role hierarchy to perform the requested action.",
+            "required": [
+              "guild_id",
+              "top_role_id",
+              "top_role_position",
+              "desired_position",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "desired_position": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The desired position your top role should be in the role hierarchy.",
+                "minimum": 0
+              },
+              "guild_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the guild you are not the owner of.",
+                "minimum": 0
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "top_role_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of your top role. This is the role you possess with the highest position.",
+                "minimum": 0
+              },
+              "top_role_position": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The position of your top role.",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "role_too_low"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You are missing the required permissions to perform the requested action.",
+            "required": [
+              "guild_id",
+              "permissions",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "guild_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the guild you are missing permissions in.",
+                "minimum": 0
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "permissions": {
+                "$ref": "#/components/schemas/Permissions"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "missing_permissions"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You are trying to delete a managed role.",
+            "required": [
+              "guild_id",
+              "role_id",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "guild_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the guild the role is in.",
+                "minimum": 0
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "role_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the role that is managed.",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "role_is_managed"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You cannot leave a server or group DM that you are the owner of (you should transfer\nownership before leaving).",
+            "required": [
+              "id",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the guild or group DM you are trying to leave.",
+                "minimum": 0
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cannot_leave_as_owner"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You cannot perform the requested action on yourself.",
+            "required": [
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cannot_act_on_self"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You cannot add bots as friends.",
+            "required": [
+              "target_id",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "target_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the bot you are trying to friend.",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cannot_friend_bots"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "The user you are trying to interact with (e.g. add as a friend, open DMs, etc.) has privacy\nsettings that prevent you from doing so.",
+            "required": [
+              "interaction_type",
+              "target_id",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "interaction_type": {
+                "$ref": "#/components/schemas/UserInteractionType"
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "target_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the user you are attempting to interact with.",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "user_interaction_disallowed"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "The user has blocked you, so you cannot interact with them.",
+            "required": [
+              "target_id",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "target_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the user that blocked you.",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "blocked_by_user"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Something was already taken, e.g. a username or email.",
+            "required": [
+              "what",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "already_taken"
+                ]
+              },
+              "what": {
+                "type": "string",
+                "description": "What was already taken."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Something already exists, e.g. a relationship.",
+            "required": [
+              "what",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "already_exists"
+                ]
+              },
+              "what": {
+                "type": "string",
+                "description": "What already exists."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "You are sending requests too quickly are you are being rate limited.",
+            "required": [
+              "retry_after",
+              "ip",
+              "message",
+              "type"
+            ],
+            "properties": {
+              "ip": {
+                "type": "string",
+                "description": "The IP address that is being rate limited."
+              },
+              "message": {
+                "type": "string",
+                "description": "The ratelimited message."
+              },
+              "retry_after": {
+                "type": "number",
+                "format": "float",
+                "description": "How long you should wait before sending another request, in whole seconds."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ratelimited"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Internal server error occured, this is likely a bug.",
+            "required": [
+              "message",
+              "type"
+            ],
+            "properties": {
+              "debug": {
+                "type": "string",
+                "description": "A debug version of the error, or `None` if there is no debug version.",
+                "nullable": true
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "internal_error"
+                ]
+              },
+              "what": {
+                "type": "string",
+                "description": "What caused the error. `None` if unknown.",
+                "nullable": true
+              }
+            }
+          }
+        ],
+        "description": "An error that occurs within Adapt.",
+        "discriminator": {
+          "propertyName": "type"
+        }
+      },
+      "Guild": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PartialGuild"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "channels": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GuildChannel"
+                },
+                "description": "A list of resolved channels in the guild.\n\nThis is only available during the following events:\n* Fetching the guild directly\n* The client retrieves the response after a request to join a guild through an invite\n* The client receives a ready event containing all guild data through the gateway.\n* The client receives a guild create event through the gateway.",
+                "nullable": true
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Member"
+                },
+                "description": "A list of resolved members in the guild.\n\nThis is only available during the following events:\n* Fetching the guild directly\n* The client retrieves the response after a request to join a guild through an invite\n* The client receives a ready event containing all guild data through the gateway.\n* The client receives a guild create event through the gateway.",
+                "nullable": true
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Role"
+                },
+                "description": "A list of resolved roles in the guild.\n\nThis is only available during the following events:\n* Fetching the guild directly\n* The client retrieves the response after a request to join a guild through an invite\n* The client receives a ready event containing all guild data through the gateway.\n* The client receives a guild create event through the gateway.",
+                "nullable": true
+              }
+            }
+          }
+        ],
+        "description": "Represents a guild with all information, sometimes referred to as a server."
+      },
+      "GuildChannel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GuildChannelInfo"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "guild_id",
+              "name",
+              "position",
+              "overwrites"
+            ],
+            "properties": {
+              "guild_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the guild that this channel is in.",
+                "minimum": 0
+              },
+              "id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the channel.",
+                "minimum": 0
+              },
+              "name": {
+                "type": "string",
+                "description": "The name of the channel."
+              },
+              "overwrites": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PermissionOverwrite"
+                },
+                "description": "The permission overwrites for this channel."
+              },
+              "parent_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the parent category of the channel. This is `None` if the channel is not in a\ncategory. This is also used for merged channels.",
+                "nullable": true,
+                "minimum": 0
+              },
+              "position": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The position of the channel in the channel list. A lower value means appearing \"higher\" in\nthe UI, basically think of this as a 0-indexed listing of the channels from top-to-bottom.\n\nPositions are scoped per category, and categories have their own positions. Channels that\nlack a category will be shown above all categories. This is because no channels can be\ndisplayed in between or after categories - in the UI all non-category channels are displayed\nabove any other category channels.\n\nFor example:\n\n```text\n[0] text-channel\n[1] voice-channel\n[2] another-text-channel\n[0] Category\n[0] another-text-channel\n[1] another-voice-channel\n[0] Another Category\n[1] nested-voice-channel\n[2] nested-voice-channel-2\n[1] Yet Another Category\n[0] another-text-channel\n```",
+                "minimum": 0
+              }
+            }
+          }
+        ],
+        "description": "Represents a channel in a guild."
+      },
+      "GuildChannelInfo": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextBasedGuildChannelInfo"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "text"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextBasedGuildChannelInfo"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "announcement"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "description": "A voice channel.",
+            "required": [
+              "user_limit",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "voice"
+                ]
+              },
+              "user_limit": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The user limit of the channel. This should be a value between `0` and `500`. A value\nof `0` indicates the absence of a user limit.",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "category"
+                ]
+              }
+            }
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextBasedGuildChannelInfo"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "merged"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "description": "Represents the type along with type-specific info of a guild channel.",
+        "discriminator": {
+          "propertyName": "type"
+        }
+      },
+      "GuildFlags": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "GuildMemberCount": {
+        "type": "object",
+        "description": "Represents member counts for a guild.",
+        "required": [
+          "total"
+        ],
+        "properties": {
+          "online": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The number of members that are online. If this was part of a partial guild object, then\nthis will be `None`.",
+            "nullable": true,
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The total number of members in the guild.",
+            "minimum": 0
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "description": "The request body for POST /login",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email to log in with."
+          },
+          "method": {
+            "$ref": "#/components/schemas/TokenRetrievalMethod"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "The password to log in with."
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "description": "The response body for POST /login",
+        "required": [
+          "user_id",
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The authentication token to use for future requests."
+          },
+          "user_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The user ID of the logged in user.",
+            "minimum": 0
+          }
+        }
+      },
+      "MalformedBodyErrorType": {
+        "type": "string",
+        "description": "The categorization of why the body is malformed.",
+        "enum": [
+          "invalid_content_type",
+          "invalid_utf8",
+          "invalid_json",
+          "invalid_multipart"
+        ]
+      },
+      "MaybePartialUser": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/User"
+          },
+          {
+            "type": "object",
+            "description": "A user with only an ID.",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              }
+            }
+          }
+        ],
+        "description": "Potentially a partial user."
+      },
+      "Member": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MaybePartialUser"
+          },
+          {
+            "type": "object",
+            "required": [
+              "guild_id",
+              "joined_at"
+            ],
+            "properties": {
+              "guild_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the guild this member is in.",
+                "minimum": 0
+              },
+              "joined_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The time that the member joined the guild."
+              },
+              "nick": {
+                "type": "string",
+                "description": "The nickname of the member. `None` if the member has no nickname.",
+                "nullable": true
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0
+                },
+                "description": "A list of IDs of the roles that the member has. This could be `None` in some cases.",
+                "nullable": true
+              }
+            }
+          }
+        ],
+        "description": "Represents a member of a guild. Members are user objects associated with a guild."
+      },
+      "MemberOrUser": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Member"
+          },
+          {
+            "$ref": "#/components/schemas/User"
+          }
+        ],
+        "description": "Represents either a member or a user."
+      },
+      "PartialGuild": {
+        "type": "object",
+        "description": "Represents a guild with partial information, sometimes referred to as a server.",
+        "required": [
+          "id",
+          "name",
+          "owner_id",
+          "flags"
+        ],
+        "properties": {
+          "banner": {
+            "type": "string",
+            "description": "The URL of the banner of the guild.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the guild.",
+            "nullable": true
+          },
+          "flags": {
+            "$ref": "#/components/schemas/GuildFlags"
+          },
+          "icon": {
+            "type": "string",
+            "description": "The URL of the icon of the guild.",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The snowflake ID of the guild.",
+            "minimum": 0
+          },
+          "member_count": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GuildMemberCount"
+              }
+            ],
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the guild."
+          },
+          "owner_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The ID of the owner of the guild.",
+            "minimum": 0
+          },
+          "vanity_url": {
+            "type": "string",
+            "description": "The vanity URL code of the guild. This solely includes the code, not the full URL.\nThis is `None` if the guild does not have a vanity URL.\n\nGuilds have the ability to set vanity URLs once they surpass 100 non-bot members *and* have\ntheir visibility set to public. The vanity URL code can be between 3 and 32 characters long.",
+            "nullable": true
+          }
+        }
+      },
+      "PermissionOverwrite": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PermissionPair"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "The ID of the role or user this overwrite applies to. The model type can be extracted from\nthe ID.",
+                "minimum": 0
+              }
+            }
+          }
+        ],
+        "description": "Represents a permission overwrite."
+      },
+      "PermissionPair": {
+        "type": "object",
+        "description": "Represents a pair of permissions, one representing allowed permissions and the other\nrepresenting denied permissions. This is so that any permission that is represented as\n\"neutral\" where it is neither allowed or denied remains easily overwritten by lower\nroles or members.",
+        "required": [
+          "allow",
+          "deny"
+        ],
+        "properties": {
+          "allow": {
+            "$ref": "#/components/schemas/Permissions"
+          },
+          "deny": {
+            "$ref": "#/components/schemas/Permissions"
+          }
+        }
+      },
+      "Permissions": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "Role": {
+        "type": "object",
+        "description": "A role in a guild.",
+        "required": [
+          "id",
+          "guild_id",
+          "name",
+          "permissions",
+          "position",
+          "flags"
+        ],
+        "properties": {
+          "color": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The color of the role. This is an integer between 0 and 16777215, or ``None`` if the role\nhas no color (in which case it inherits the color).",
+            "nullable": true,
+            "minimum": 0
+          },
+          "flags": {
+            "$ref": "#/components/schemas/RoleFlags"
+          },
+          "guild_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The ID of the guild this role belongs to.",
+            "minimum": 0
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The snowflake ID of the role.",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the role."
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/PermissionPair"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The position of this role in the role hierarchy. The lower the number, the lower the role.\nThe default role always has a position of 0.\n\nThe backend will try its best to keep all role positions unique, but on the event two\ncollide due to something such as a data race, then the true position of these roles will\nnot be predictable, and will likely be in the order of model creation.",
+            "minimum": 0
+          }
+        }
+      },
+      "RoleFlags": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "TextBasedGuildChannelInfo": {
+        "type": "object",
+        "description": "Represents common information found in text-based guild channels.",
+        "required": [
+          "nsfw",
+          "locked",
+          "slowmode"
+        ],
+        "properties": {
+          "last_message_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The ID of the last message sent in this channel. This is `None` if no messages have been\nsent in this channel, and is sometimes always none in partial contexts.",
+            "nullable": true,
+            "minimum": 0
+          },
+          "locked": {
+            "type": "boolean",
+            "description": "Whether the channel is locked. Only people with the `MANAGE_CHANNELS` permission can\nsend messages in locked channels."
+          },
+          "nsfw": {
+            "type": "boolean",
+            "description": "Whether the channel is NSFW."
+          },
+          "slowmode": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The slowmode delay of the channel, in **milliseconds**. This should be a value between\n`0` and `86_400_000` (24 hours). `0` indicates the absence of slowmode.",
+            "minimum": 0
+          },
+          "topic": {
+            "type": "string",
+            "description": "The topic of the channel, if any.",
+            "nullable": true
+          }
+        }
+      },
+      "TokenRetrievalMethod": {
+        "type": "string",
+        "description": "The method to use to retrieve an authentication token.",
+        "enum": [
+          "new",
+          "revoke",
+          "reuse"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "description": "Represents a user account.\n\nA lot of information is stored in the user's flags, including whether or not the user is a bot\naccount.",
+        "required": [
+          "id",
+          "username",
+          "flags"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "string",
+            "description": "The URL of the user's avatar. This is `None` if the user has no avatar.",
+            "nullable": true
+          },
+          "banner": {
+            "type": "string",
+            "description": "The URL of the user's banner. This is `None` if the user has no banner.",
+            "nullable": true
+          },
+          "bio": {
+            "type": "string",
+            "description": "The user's bio. This is `None` if the user has no bio.",
+            "nullable": true
+          },
+          "display_name": {
+            "type": "string",
+            "description": "The display name of the user. This is `None` if the user has no display name.",
+            "nullable": true
+          },
+          "flags": {
+            "$ref": "#/components/schemas/UserFlags"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The snowflake ID of the user.",
+            "minimum": 0
+          },
+          "username": {
+            "type": "string",
+            "description": "The username of the user."
+          }
+        }
+      },
+      "UserFlags": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "UserInteractionType": {
+        "type": "string",
+        "description": "The type of user interaction that was disallowed.",
+        "enum": [
+          "dm",
+          "group_dm",
+          "friend_request"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "token": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}

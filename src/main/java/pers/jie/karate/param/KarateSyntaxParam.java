@@ -12,12 +12,14 @@ public class KarateSyntaxParam {
     public static final String THEN = "    Then ";
     public static final String FEATURE = "Feature: %s\n";
     public static final String BACKGROUND = "  Background:\n";
+    public static final String CHARSET = "configure charset = null\n";
     public static final String URL = "url '%s'\n";
     public static final String PATH = "path '%s'\n";
     public static final String PARAM = "param %s = '%s'\n";
     public static final String REQUEST = "request %s\n";
     public static final String METHOD = "method %s\n";
     public static final String STATUS = "status %s\n";
-    public static final String DEF_TOKEN = "def token = responseHeaders.token\n";
+    public static final String DEF_HEADERS_TOKEN = "def token = responseHeaders.token\n";
+    public static final String DEF_BODY_TOKEN = "def token = response.token\n";
     public static final String HEADER_TOKEN = "header Authorization = token\n";
 }

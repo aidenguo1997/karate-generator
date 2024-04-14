@@ -12,11 +12,6 @@
       "description": "Generated server url"
     }
   ],
-  "security":[
-    {
-      "JWT Authentication":[]
-    }
-  ],
   "tags": [
     {
       "name": "User",
