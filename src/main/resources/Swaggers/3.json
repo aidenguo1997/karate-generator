@@ -2,7 +2,9 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Adapt REST API",
-    "description": "Public REST API for the Adapt chat platform",
+    "description": "",
+    "x-has-body-token": true,
+    "x-body-token-path": "$.token",
     "license": {
       "name": "AGPL-3.0"
     },

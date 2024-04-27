@@ -1,6 +1,7 @@
 package pers.jie.karate.param;
 
 public class KarateSyntaxParam {
+    public static final String NEWLINE = "\n";
     public static final String SESSION_TAG = "#session";
     public static final String TAG = "#";
     public static final String BACKGROUND_TITLE = "    * ";
@@ -20,6 +21,6 @@ public class KarateSyntaxParam {
     public static final String METHOD = "method %s\n";
     public static final String STATUS = "status %s\n";
     public static final String DEF_HEADERS_TOKEN = "def token = responseHeaders.token\n";
-    public static final String DEF_BODY_TOKEN = "def token = response.token\n";
+    public static final String DEF_BODY_TOKEN = "def token = response";
     public static final String HEADER_TOKEN = "header Authorization = token\n";
 }

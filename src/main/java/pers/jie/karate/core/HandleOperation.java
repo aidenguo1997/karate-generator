@@ -1,7 +1,7 @@
 package pers.jie.karate.core;
 
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.*;
-import io.swagger.v3.oas.models.media.Schema;
 import pers.jie.karate.param.KarateSyntaxParam;
 import pers.jie.karate.tag.GherkinTag;
 
@@ -54,9 +54,9 @@ public class HandleOperation {
                                 karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.STATUS, statusCode));
                                 boolean isSecurity = hasSecurity(openAPI);
                                 if (isSecurity) {
-                                    boolean isBodyToken = isTokenPropertyExists(openAPI);
+                                    boolean isBodyToken = isBodyToken(openAPI);
                                     if (isBodyToken) {
-                                        karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_BODY_TOKEN);
+                                        karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_BODY_TOKEN).append(bodyTokenPath(openAPI)).append(KarateSyntaxParam.NEWLINE);
                                     } else {
                                         karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_HEADERS_TOKEN);
                                     }
@@ -108,25 +108,44 @@ public class HandleOperation {
         }
     }
 
-    private boolean hasSecurity(OpenAPI openAPI) {
-        // 首先檢查全局的安全屬性是否存在
-        return openAPI.getComponents().getSecuritySchemes() != null;
-    }
-
-    private boolean isTokenPropertyExists(OpenAPI openAPI) {
-        // 獲取 components
-        Components components = openAPI.getComponents();
-        if (components.getSchemas() != null) {
-            // 遍歷所有的 schemas
-            for (Schema<?> schema : components.getSchemas().values()) {
-                // 查找具有 token 屬性的 schema
-                if (schema.getProperties() != null && schema.getProperties().containsKey("token")) {
+    public static boolean hasSecurity(OpenAPI openAPI) {
+        // 检查每个操作的安全要求
+        for (Map.Entry<String, PathItem> entry : openAPI.getPaths().entrySet()) {
+            PathItem pathItem = entry.getValue();
+            for (Operation operation : pathItem.readOperations()) {
+                if (hasSecurityRequirement(operation.getSecurity())) {
                     return true;
                 }
             }
         }
-        return false;
+        // 检查全局的安全要求
+        return hasSecurityRequirement(openAPI.getSecurity());
     }
+
+    private static boolean hasSecurityRequirement(List<SecurityRequirement> securityRequirements) {
+        return securityRequirements != null && !securityRequirements.isEmpty();
+    }
+
+    private <T> T getExtensionValue(OpenAPI openAPI, String extensionName, Class<T> valueType) {
+        Map<String, Object> extensions = openAPI.getInfo().getExtensions();
+        if (extensions != null && extensions.containsKey(extensionName)) {
+            Object value = extensions.get(extensionName);
+            if (valueType.isInstance(value)) {
+                return valueType.cast(value);
+            }
+        }
+        return null;
+    }
+
+    private boolean isBodyToken(OpenAPI openAPI) {
+        return Boolean.TRUE.equals(getExtensionValue(openAPI, "x-has-body-token", Boolean.class));
+    }
+
+    private String bodyTokenPath(OpenAPI openAPI) {
+        String path = getExtensionValue(openAPI, "x-body-token-path", String.class);
+        return path != null ? path.replace("$", "") : null;
+    }
+
 
     private void assertParametersNotNull(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, StringBuilder karateScript) {
         assert openAPI != null : "OpenAPI cannot be null";

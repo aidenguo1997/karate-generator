@@ -12,6 +12,11 @@
       "description": "Generated server url"
     }
   ],
+  "security": [
+    {
+      "JWT Authentication": []
+    }
+  ],
   "tags": [
     {
       "name": "User",
@@ -427,7 +432,6 @@
         }
       }
     },
-
     "/reward/add": {
       "post": {
         "tags": [
@@ -2070,5 +2074,13 @@
       }
     }
   },
-  "components": {}
+  "components": {
+    "securitySchemes": {
+      "JWT Authentication": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
 }
