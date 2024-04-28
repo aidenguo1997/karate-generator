@@ -56,7 +56,7 @@ public class HandleOperation {
                                 if (isSecurity) {
                                     boolean isBodyToken = isBodyToken(openAPI);
                                     if (isBodyToken) {
-                                        karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_BODY_TOKEN).append(bodyTokenPath(openAPI)).append(KarateSyntaxParam.NEWLINE);
+                                        karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_BODY_TOKEN).append(bodyTokenPath(openAPI));
                                     } else {
                                         karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_HEADERS_TOKEN);
                                     }
@@ -145,7 +145,6 @@ public class HandleOperation {
         String path = getExtensionValue(openAPI, "x-body-token-path", String.class);
         return path != null ? path.replace("$", "") : null;
     }
-
 
     private void assertParametersNotNull(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, StringBuilder karateScript) {
         assert openAPI != null : "OpenAPI cannot be null";

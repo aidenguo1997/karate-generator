@@ -4,7 +4,7 @@
     "title": "Adapt REST API",
     "description": "",
     "x-has-body-token": true,
-    "x-body-token-path": "$.token",
+    "x-body-token-path": "$.token\n",
     "license": {
       "name": "AGPL-3.0"
     },

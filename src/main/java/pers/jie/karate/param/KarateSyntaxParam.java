@@ -1,7 +1,6 @@
 package pers.jie.karate.param;
 
 public class KarateSyntaxParam {
-    public static final String NEWLINE = "\n";
     public static final String SESSION_TAG = "#session";
     public static final String TAG = "#";
     public static final String BACKGROUND_TITLE = "    * ";
