@@ -4,7 +4,7 @@ public class KarateSyntaxParam {
     public static final String SESSION_TAG = "#session";
     public static final String TAG = "#";
     public static final String BACKGROUND_TITLE = "    * ";
-    public static final String SCENARIO = "\n  Scenario: %s\n";
+    public static final String SCENARIO = "\n  Scenario Outline: %s\n";
     public static final String PROMPT = "    # 依據Karate規範，後續Scenario如需session，則Scenario: %s將移入Background\n"    ;
     public static final String GIVEN = "    Given ";
     public static final String AND = "    And ";

@@ -2,11 +2,36 @@
   {
     "path": "/login",
     "method": "POST",
-    "request_text": "{\"email\":\"ab295@gmail.com\",\"password\":\"6666666\"}"
+    "request_text": "[{\"email\": \"ab22213395@yahoo.com\", \"password\": \"zxc123\"}, {\"email\": \"ab22213395@gmail.com\", \"password\": \"cd0697985\"}, {\"email\": \"ab22213395@gmail.com\", \"password\": \"cd069798\"}, {\"email\": \"ab22213395@yahoo.com\", \"password\": \"zxc123\"}, {\"email\": \"ab22213395@gmail.com\", \"password\": \"cd069798\"}]"
   },
   {
     "path": "/guilds",
     "method": "POST",
-    "request_text": "{\"name\":\"aiden777\",\"nonce\":\"10666230188605440\"}"
+    "request_text": "[{\"name\": \"wds\", \"nonce\": \"11296274215075840\"}, {\"name\": \"CRT\", \"nonce\": \"11296275445317632\"}, {\"name\": \"TES\", \"nonce\": \"11296288089571328\"}, {\"name\": \"EYB\", \"nonce\": \"11296294094241792\"}, {\"name\": \"WTR\", \"nonce\": \"11296331297456128\"}]"
+  },
+  {
+    "path": "/guilds/11296289750253672/channels",
+    "method": "POST",
+    "request_text": "[{\"type\": \"text\", \"name\": \"998\", \"nonce\": \"11296305533419520\"}, {\"type\": \"text\", \"name\": \"997\", \"nonce\": \"11296307548520448\"}]"
+  },
+  {
+    "path": "/guilds/11136007260340286/channels",
+    "method": "POST",
+    "request_text": "{\"type\":\"text\",\"name\":\"741\",\"nonce\":\"11296310678257664\"}"
+  },
+  {
+    "path": "/guilds/10666865461297196/channels",
+    "method": "POST",
+    "request_text": "{\"type\":\"text\",\"name\":\"TTE\",\"nonce\":\"11296319569920000\"}"
+  },
+  {
+    "path": "/guilds/10667082527277102/channels",
+    "method": "POST",
+    "request_text": "[{\"type\": \"text\", \"name\": \"WWD\", \"nonce\": \"11296321536000000\"}, {\"type\": \"text\", \"name\": \"$$D\", \"nonce\": \"11296337484316672\"}]"
+  },
+  {
+    "path": "/guilds/11296327086899306/channels",
+    "method": "POST",
+    "request_text": "{\"type\":\"text\",\"name\":\"QCV\",\"nonce\":\"11296334129135616\"}"
   }
 ]

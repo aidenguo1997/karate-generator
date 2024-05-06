@@ -1,55 +1,74 @@
-import mitmproxy.http
 import json
-
-
+import os
 
 class CaptureInfoWriteFile:
     def __init__(self):
-        self.output_file = 'captured_data.json'  # 指定输出文件名
-        #self.url = None  # 初始化为 None
-        # http static resource file extension
+        self.history_file = 'request_history.json'  # 指定历史请求文件名
         self.static_ext = ['js', 'css', 'ico', 'jpg', 'png', 'gif', 'jpeg', 'bmp', 'conf']
-        # 初始化一个空的列表，用于存储捕获到的信息
-        self.data_list = []
 
-    def is_json_response(self, response_text):
-        if not response_text:
-            return False  # 空字符串不是有效的 JSON
+        # 如果历史请求文件不存在，则创建一个空文件
+        if not os.path.exists(self.history_file):
+            with open(self.history_file, 'w') as history_file:
+                history_file.write('[]')
 
-        try:
-            # 尝试解析响应体为 JSON
-            json.loads(response_text)
-            return True
-        except json.JSONDecodeError:
-            return False
-        
-    def request(self, flow: mitmproxy.http.HTTPFlow):
+    def request(self, flow):
         flow_request = flow.request
-        self.url = flow_request.url
-        self.path = flow_request.path
-        self.method = flow_request.method
-        self.text = flow_request.get_text()
-        lastPath = self.url.split('?')[0].split('/')[-1]
-        if flow.request.host != "127.0.0.1:8102":
+        url = flow_request.url
+        path = flow_request.path
+        method = flow_request.method
+        text = flow_request.get_text()
+        last_path = url.split('?')[0].split('/')[-1]
+        
+        if flow_request.host != "tmall.up.railway.app":
             return
         
-        if lastPath.split('.')[-1] in self.static_ext:
+        if last_path.split('.')[-1] in self.static_ext:
             return
         
-        if not self.text:
+        if not text:
             return
         
-        data = {
-            'path': self.path,
-            'method': self.method,
-            'request_text': self.text
-        }
-        self.data_list.append(data)
-          
-
-    def done(self):
-        # 将列表中的信息写入JSON文件
-        with open(self.output_file, 'w') as json_file:
-            json.dump(self.data_list, json_file, indent=2, default=str)
+        # 读取历史请求文件
+        with open(self.history_file, 'r') as history_file:
+            history_data = json.load(history_file)
+        
+        # 检查是否存在具有相同路径和方法的条目
+        for item in history_data:
+            if item['path'] == path and item['method'] == method:
+                # 合并请求文本到现有条目
+                item['request_text'] = self._merge_request_text(item['request_text'], text)
+                break
+        else:
+            # 如果不存在，则添加新条目
+            data = {
+                'path': path,
+                'method': method,
+                'request_text': text
+            }
+            history_data.append(data)
+        
+        # 写入历史请求文件
+        with open(self.history_file, 'w') as history_file:
+            json.dump(history_data, history_file, indent=2, default=str)
+    
+    def _merge_request_text(self, existing_text, new_text):
+        try:
+            existing_data = json.loads(existing_text)
+            new_data = json.loads(new_text)
+            if isinstance(existing_data, list):
+                if isinstance(new_data, list):
+                    return json.dumps(existing_data + new_data)
+                else:
+                    existing_data.append(new_data)
+                    return json.dumps(existing_data)
+            else:
+                if isinstance(new_data, list):
+                    new_data.append(existing_data)
+                    return json.dumps(new_data)
+                else:
+                    return json.dumps([existing_data, new_data])
+        except json.JSONDecodeError:
+            # 如果现有文本不是JSON格式，则将新文本作为单独的请求保存
+            return existing_text + '\n' + new_text
 
 addons = [CaptureInfoWriteFile()]

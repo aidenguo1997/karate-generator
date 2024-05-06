@@ -1,16 +1,25 @@
-Feature: JWT REST API
+Feature: Adapt REST API
+
   Background:
-    * url 'http://127.0.0.1:8102'
+    * url 'https://api.adapt.chat'
     * configure charset = null
-    * path '/auth/login'
-    * request {"username":"jie123","password":"??????"}
+      # 依據Karate規範，後續Scenario如需session，則Scenario: Generate Token (Login)Login to the API with your email and password to retrieve an authentication token.將移入Background
+    * path '/login'
+    * request [{"email": "ab22213395@yahoo.com", "password": "zxc123"}]
     * method POST
     * status 200
-    * def token = responseHeaders.token
+    * def token = response.token
     * header Authorization = token
 
-  Scenario: Create tasks
-    Given path '/tasks'
-    And path taskId = '0'
-    When method DELETE
-    Then status 200
+  Scenario Outline: Create GuildCreates a new guild with the given payload.
+    Given path '/guilds'
+    And request {"name": "<name>", "nonce": "<nonce>"}
+    When method POST
+    Then status 201
+    Examples:
+      | name | nonce             |
+      | wds  | 11296274215075840 |
+      | CRT  | 11296275445317632 |
+      | TES  | 11296288089571328 |
+      | EYB  | 11296294094241792 |
+      | WTR  | 11296331297456128 |

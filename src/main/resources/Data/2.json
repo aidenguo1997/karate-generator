@@ -2,11 +2,12 @@
   {
     "path": "/tmall/login/doLogin",
     "method": "POST",
-    "request_text": "username=s5678&password=zxc123321"
+    "request_text": "username=zx123&password=zxc123321\nusername=jie123&password=zxc12321\nusername=qa123&password=zxc123321"
   },
+
   {
     "path": "/tmall/user/update",
     "method": "POST",
-    "request_text": "user_profile_picture_src=&user_nickname=Alean&user_realname=Guo+Jie&user_password=zxc123321&user_password_one=zxc123321&user_gender=1&user_birthday=2023-11-29&user_address=220421"
+    "request_text": "user_name=zx123&user_password=zxc123321&user_nickname=ee&user_birthday=2024-05-18&user_gender=0&user_address=110101\nuser_name=qa123&user_password=zxc123321&user_nickname=ww&user_birthday=2024-05-09&user_gender=0&user_address=110101"
   }
 ]

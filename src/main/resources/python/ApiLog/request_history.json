@@ -1,0 +1,22 @@
+[
+  {
+    "path": "/tmall/login/doLogin",
+    "method": "POST",
+    "request_text": "username=zx123&password=zxc123321\nusername=jie123&password=zxc123321\nusername=qa123&password=zxc123321"
+  },
+  {
+    "path": "/login",
+    "method": "POST",
+    "request_text": "[{\"email\": \"ab22213395@yahoo.com\", \"password\": \"zxc123\"}, {\"email\": \"ab22213395@yahoo.com\", \"password\": \"zxc123\"}, {\"email\": \"ab22213395@gmail.com\", \"password\": \"cd069798\"}]"
+  },
+  {
+    "path": "/guilds",
+    "method": "POST",
+    "request_text": "[{\"name\": \"751\", \"nonce\": \"11299429438980096\"}, {\"name\": \"265\", \"nonce\": \"11299430591365120\"}]"
+  },
+  {
+    "path": "/tmall/register/doRegister",
+    "method": "POST",
+    "request_text": "user_name=zx123&user_password=zxc123321&user_nickname=ee&user_birthday=2024-05-18&user_gender=0&user_address=110101\nuser_name=qa123&user_password=zxc123321&user_nickname=ww&user_birthday=2024-05-09&user_gender=0&user_address=110101"
+  }
+]
