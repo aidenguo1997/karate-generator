@@ -15,7 +15,7 @@ public class KarateSyntaxParam {
     public static final String CHARSET = "configure charset = null\n";
     public static final String URL = "url '%s'\n";
     public static final String PATH = "path '%s'\n";
-    public static final String PARAM = "param %s = '%s'\n";
+    public static final String PARAM = "param %s = '<%s>'\n";
     public static final String REQUEST = "request %s\n";
     public static final String METHOD = "method %s\n";
     public static final String STATUS = "status %s\n";

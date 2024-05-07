@@ -2,10 +2,7 @@ package pers.jie.karate.core;
 
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
 import pers.jie.karate.param.KarateSyntaxParam;
 import pers.jie.karate.tag.GherkinTag;
@@ -95,43 +92,25 @@ public class HandleOperation {
                             karateScript.append(String.format(KarateSyntaxParam.AND + KarateSyntaxParam.REQUEST, convertToDesiredFormat(requestText)));
                         }
                     } else {
-                        if (isBackground) {
-                            String[] keyValuePairs = requestText.split("&");
-                            for (String pair : keyValuePairs) {
-                                String[] parts = pair.split("=");
-                                //System.out.println(parts[0]+parts[1]);
-                                if (parts.length == 2) {
+
+                        String[] lines = requestText.split("\n");
+                        String[] keyValuePairs = lines[0].split("&");
+                        for (String pair : keyValuePairs) {
+                            String[] parts = pair.split("=");
+                            System.out.println(parts[0] + parts[1]);
+                            if (parts.length == 2) {
+                                if (isBackground) {
                                     karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.PARAM, parts[0], parts[1]));
+                                } else {
+                                    karateScript.append(String.format(KarateSyntaxParam.AND + KarateSyntaxParam.PARAM, parts[0], parts[0]));
                                 }
                             }
-                        } else {
-                            List<String[]> formattedKeys = formatKeys(requestText);
-                            for (String[] key : formattedKeys) {
-                                karateScript.append(String.format(KarateSyntaxParam.AND + KarateSyntaxParam.PARAM, key[0], key[1]));
-                            }
                         }
-
                     }
                     break;
                 }
             }
         }
-    }
-
-    private List<String[]> formatKeys(String data) {
-        List<String[]> formattedKeys = new ArrayList<>();
-        // 分割字符串为行
-        String[] lines = data.split("\n");
-        // 处理第一行数据
-        String[] keyValuePairs = lines[0].split("&");
-        for (String pair : keyValuePairs) {
-            String[] parts = pair.split("=");
-            if (parts.length == 2) {
-                String[] formattedPair = {parts[0], "'<" + parts[0] + ">'"};
-                formattedKeys.add(formattedPair);
-            }
-        }
-        return formattedKeys;
     }
 
     private String handleOperationParametersTable(Operation operation, List<Map<String, String>> requestDataList, String path) {
