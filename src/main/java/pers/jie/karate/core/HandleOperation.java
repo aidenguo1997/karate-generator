@@ -2,7 +2,6 @@ package pers.jie.karate.core;
 
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.*;
-import com.google.gson.*;
 
 import pers.jie.karate.param.KarateSyntaxParam;
 import pers.jie.karate.tag.GherkinTag;
@@ -12,9 +11,15 @@ import java.util.*;
 public class HandleOperation {
 
     private final GherkinTag gherkinTag;
+    private final HandleParameters parameters;
+    private final HandleRequestData requestData;
+    private final HandleDataTables dataTables;
 
-    public HandleOperation(GherkinTag gherkinTag) {
+    public HandleOperation(GherkinTag gherkinTag, HandleParameters parameters, HandleRequestData requestData, HandleDataTables dataTables) {
         this.gherkinTag = gherkinTag;
+        this.parameters = parameters;
+        this.requestData = requestData;
+        this.dataTables = dataTables;
     }
 
     public void handleOperation(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, boolean isBackground, StringBuilder karateScript, List<String> errors) {
@@ -46,193 +51,46 @@ public class HandleOperation {
                         karateScript.append(String.format(KarateSyntaxParam.SCENARIO, operation.getDescription().replaceAll("\n", "")));
                         karateScript.append(String.format(KarateSyntaxParam.GIVEN + KarateSyntaxParam.PATH, path));
                     }
-                    handleOperationParameters(operation, requestDataList, path, karateScript, isBackground);
-                    operation.getResponses().forEach((statusCode, response) -> {
-                        int statusCodeValue = Integer.parseInt(statusCode);
-                        if (statusCodeValue >= 200 && statusCodeValue < 300) {
-                            if (isBackground) {
-                                karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.METHOD, httpMethod));
-                                karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.STATUS, statusCode));
-                                boolean isSecurity = hasSecurity(openAPI);
-                                if (isSecurity) {
-                                    boolean isBodyToken = isBodyToken(openAPI);
-                                    if (isBodyToken) {
-                                        karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_BODY_TOKEN).append(bodyTokenPath(openAPI));
-                                    } else {
-                                        karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_HEADERS_TOKEN);
-                                    }
-                                    karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.HEADER_TOKEN);
-                                }
-                            } else {
-                                karateScript.append(String.format(KarateSyntaxParam.WHEN + KarateSyntaxParam.METHOD, httpMethod));
-                                karateScript.append(String.format(KarateSyntaxParam.THEN + KarateSyntaxParam.STATUS, statusCode));
-                                karateScript.append(handleOperationParametersTable(operation, requestDataList, path));
-                            }
-                        }
-
-                    });
+                    handleOperationDetails(openAPI, operation, requestDataList, path, httpMethod, karateScript, isBackground);
                 }
             });
         }
     }
 
-    private void handleOperationParameters(Operation operation, List<Map<String, String>> requestDataList, String path, StringBuilder karateScript, boolean isBackground) {
+    private void handleOperationDetails(OpenAPI openAPI, Operation operation, List<Map<String, String>> requestDataList, String path, PathItem.HttpMethod httpMethod, StringBuilder karateScript, boolean isBackground) {
         if (operation.getParameters() != null || operation.getRequestBody() != null) {
-            for (Map<String, String> requestData : requestDataList) {
-                String requestDataPath = requestData.get("path");
-                String normalizedRequestPath = requestDataPath.replaceAll(".*/", "").toLowerCase();
-                String normalizedPath = path.replaceAll(".*/", "").toLowerCase();
-                if (normalizedRequestPath.equals(normalizedPath)) {
-                    String requestText = requestData.get("request_text");
-                    boolean isJson = requestText.matches("^\\s*(\\{.*}|\\[.*])\\s*$");
-                    if (isJson) {
-                        if (isBackground) {
-                            karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.REQUEST, getFirstData(requestText)));
+            Map<String, String> request = requestData.findMatchingRequestData(requestDataList, path);
+            if (request != null) {
+                parameters.handleOperationParameters(request, karateScript, isBackground);
+                handleResponseStatus(openAPI, operation, path, requestDataList, karateScript, httpMethod, isBackground);
+            }
+        }
+    }
+
+    private void handleResponseStatus(OpenAPI openAPI, Operation operation, String path, List<Map<String, String>> requestDataList, StringBuilder karateScript, PathItem.HttpMethod httpMethod, boolean isBackground) {
+        operation.getResponses().forEach((statusCode, response) -> {
+            int statusCodeValue = Integer.parseInt(statusCode);
+            if (statusCodeValue >= 200 && statusCodeValue < 300) {
+                if (isBackground) {
+                    karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.METHOD, httpMethod));
+                    karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.STATUS, statusCode));
+                    boolean isSecurity = hasSecurity(openAPI);
+                    if (isSecurity) {
+                        boolean isBodyToken = isBodyToken(openAPI);
+                        if (isBodyToken) {
+                            karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_BODY_TOKEN).append(bodyTokenPath(openAPI)).append(KarateSyntaxParam.NEWLINE);
                         } else {
-                            karateScript.append(String.format(KarateSyntaxParam.AND + KarateSyntaxParam.REQUEST, convertToDesiredFormat(requestText)));
+                            karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.DEF_HEADERS_TOKEN);
                         }
-                    } else {
-
-                        String[] lines = requestText.split("\n");
-                        String[] keyValuePairs = lines[0].split("&");
-                        for (String pair : keyValuePairs) {
-                            String[] parts = pair.split("=");
-                            System.out.println(parts[0] + parts[1]);
-                            if (parts.length == 2) {
-                                if (isBackground) {
-                                    karateScript.append(String.format(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.PARAM, parts[0], parts[1]));
-                                } else {
-                                    karateScript.append(String.format(KarateSyntaxParam.AND + KarateSyntaxParam.PARAM, parts[0], parts[0]));
-                                }
-                            }
-                        }
+                        karateScript.append(KarateSyntaxParam.BACKGROUND_TITLE + KarateSyntaxParam.HEADER_TOKEN);
                     }
-                    break;
+                } else {
+                    karateScript.append(String.format(KarateSyntaxParam.WHEN + KarateSyntaxParam.METHOD, httpMethod));
+                    karateScript.append(String.format(KarateSyntaxParam.THEN + KarateSyntaxParam.STATUS, statusCode));
+                    karateScript.append(dataTables.handleOperationParametersTable(requestDataList, path));
                 }
             }
-        }
-    }
-
-    private String handleOperationParametersTable(Operation operation, List<Map<String, String>> requestDataList, String path) {
-        if (operation.getParameters() != null || operation.getRequestBody() != null) {
-            for (Map<String, String> requestData : requestDataList) {
-                String requestDataPath = requestData.get("path");
-                String normalizedRequestPath = requestDataPath.replaceAll(".*/", "").toLowerCase();
-                String normalizedPath = path.replaceAll(".*/", "").toLowerCase();
-                if (normalizedRequestPath.equals(normalizedPath)) {
-                    String requestText = requestData.get("request_text");
-                    boolean isJson = requestText.matches("^\\s*(\\{.*}|\\[.*])\\s*$");
-                    if (isJson) {
-                        Gson gson = new Gson();
-                        List jsonData = gson.fromJson(requestText, List.class);
-                        return convertToJsonTable(jsonData);
-                    } else {
-                        return convertToExamplesTable(requestText);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private JsonObject getFirstData(String jsonDataString) {
-        // 解析 JSON 字符串为列表
-        Gson gson = new Gson();
-        JsonArray jsonArray = gson.fromJson(jsonDataString, JsonArray.class);
-        // 取第一个对象，构建结果对象
-        return jsonArray.get(0).getAsJsonObject();
-    }
-
-    private String convertToDesiredFormat(String jsonDataString) {
-        // 创建结果 JSON 对象
-        JsonObject result = new JsonObject();
-        // 取第一个对象，构建结果对象
-        JsonObject firstData = getFirstData(jsonDataString);
-        //System.out.println(firstData);
-        for (Map.Entry<String, JsonElement> entry : firstData.entrySet()) {
-            String key = entry.getKey();
-            result.addProperty(key, "<" + key + ">");
-        }
-        return result.toString();
-    }
-
-    private String convertToJsonTable(List<Map<String, String>> jsonData) {
-        StringBuilder table = new StringBuilder("    Examples:\n");
-        if (jsonData != null && !jsonData.isEmpty()) {
-            // Get the keys from the first map
-            Map<String, String> firstMap = jsonData.get(0);
-            String[] keys = firstMap.keySet().toArray(new String[0]);
-
-            // Append table header
-            table.append("      | ");
-            for (String key : keys) {
-                table.append(key).append(" | ");
-            }
-            table.append("\n");
-
-            // Append table data
-            for (Map<String, String> map : jsonData) {
-                table.append("      | ");
-                for (String key : keys) {
-                    table.append(map.get(key)).append(" | ");
-                }
-                table.append("\n");
-            }
-        }
-        return table.toString();
-    }
-
-    private String convertToExamplesTable(String data) {
-        // 分割字符串为行
-        String[] lines = data.split("\n");
-
-        // 使用 Set 來確保鍵的唯一性
-        Set<String> keysSet = new HashSet<>();
-
-        // 遍歷每一行，獲取所有鍵
-        for (String line : lines) {
-            String[] keyValuePairs = line.split("&");
-            for (String pair : keyValuePairs) {
-                String[] parts = pair.split("=");
-                keysSet.add(parts[0]); // 添加到 Set 中
-            }
-        }
-
-        // 將 Set 轉換為列表並按字母順序排序
-        List<String> keys = new ArrayList<>(keysSet);
-        Collections.sort(keys);
-
-        // 构建 Examples 表格
-        StringBuilder examplesTable = new StringBuilder();
-
-        // 添加表頭
-        examplesTable.append("    Examples:\n");
-        examplesTable.append("      |");
-        for (String key : keys) {
-            examplesTable.append(" ").append(key).append(" |");
-        }
-        examplesTable.append("\n");
-
-        // 添加數據行
-        for (String line : lines) {
-            examplesTable.append("      |");
-            String[] keyValuePairs = line.split("&");
-            for (String key : keys) {
-                String value = ""; // 初始化為空字符串
-                // 遍歷每個鍵值對，找到對應的值
-                for (String pair : keyValuePairs) {
-                    String[] parts = pair.split("=");
-                    if (parts[0].equals(key)) {
-                        value = parts[1];
-                        break;
-                    }
-                }
-                examplesTable.append(" ").append(value).append(" |");
-            }
-            examplesTable.append("\n");
-        }
-
-        return examplesTable.toString();
+        });
     }
 
     private boolean hasSecurity(OpenAPI openAPI) {
