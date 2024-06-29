@@ -8,14 +8,14 @@ import pers.jie.karate.tag.GherkinTag;
 
 import java.util.*;
 
-public class HandleOperation {
+public class OperationHandler {
 
     private final GherkinTag gherkinTag;
-    private final HandleParameters parameters;
-    private final HandleRequestData requestData;
-    private final HandleDataTables dataTables;
+    private final ParametersHandler parameters;
+    private final RequestDataHandler requestData;
+    private final DataTablesHandler dataTables;
 
-    public HandleOperation(GherkinTag gherkinTag, HandleParameters parameters, HandleRequestData requestData, HandleDataTables dataTables) {
+    public OperationHandler(GherkinTag gherkinTag, ParametersHandler parameters, RequestDataHandler requestData, DataTablesHandler dataTables) {
         this.gherkinTag = gherkinTag;
         this.parameters = parameters;
         this.requestData = requestData;
@@ -59,7 +59,7 @@ public class HandleOperation {
 
     private void handleOperationDetails(OpenAPI openAPI, Operation operation, List<Map<String, String>> requestDataList, String path, PathItem.HttpMethod httpMethod, StringBuilder karateScript, boolean isBackground) {
         if (operation.getParameters() != null || operation.getRequestBody() != null) {
-            Map<String, String> request = requestData.findMatchingRequestData(requestDataList, path);
+            Map<String, String> request = requestData.findMatchingRequestData(requestDataList, path, httpMethod);
             if (request != null) {
                 parameters.handleOperationParameters(request, karateScript, isBackground);
                 handleResponseStatus(openAPI, operation, path, requestDataList, karateScript, httpMethod, isBackground);
@@ -87,7 +87,7 @@ public class HandleOperation {
                 } else {
                     karateScript.append(String.format(KarateSyntaxParam.WHEN + KarateSyntaxParam.METHOD, httpMethod));
                     karateScript.append(String.format(KarateSyntaxParam.THEN + KarateSyntaxParam.STATUS, statusCode));
-                    karateScript.append(dataTables.handleOperationParametersTable(requestDataList, path));
+                    karateScript.append(dataTables.handleOperationParametersTable(requestDataList, path, httpMethod));
                 }
             }
         });

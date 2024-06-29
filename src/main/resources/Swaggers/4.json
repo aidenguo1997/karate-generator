@@ -1,0 +1,93 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Sight API",
+    "description": "Spring Sight sample application",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://keelungsight-production.up.railway.app",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Sight",
+      "description": "The Sight API"
+    }
+  ],
+  "paths": {
+    "/SightAPI": {
+      "get": {
+        "tags": [
+          "Sight"
+        ],
+        "summary": "#api_S1",
+        "description": "Get a list of sights",
+        "operationId": "getSights",
+        "parameters": [
+          {
+            "name": "param",
+            "in": "query",
+            "description": "zone",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SightQueryParameter"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Sight"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SightQueryParameter": {
+        "type": "object",
+        "properties": {
+          "zone": {
+            "type": "string"
+          }
+        }
+      },
+      "Sight": {
+        "type": "object",
+        "properties": {
+          "sightName": {
+            "type": "string"
+          },
+          "zone": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "photoURL": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

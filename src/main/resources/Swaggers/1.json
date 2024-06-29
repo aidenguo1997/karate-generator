@@ -440,7 +440,7 @@
 		"/register/doRegister": {
 			"post": {
 				"tags": ["Register"],
-				"summary": "#api_S2",
+				"summary": "#api_S1",
 				"description": "Register",
 				"operationId": "register",
 				"parameters": [{
@@ -705,7 +705,7 @@
 		"/login/doLogin": {
 			"post": {
 				"tags": ["Login"],
-				"summary": "#api_S1",
+				"summary": "#api_S2",
 				"description": "Check Login",
 				"operationId": "checkLogin",
 				"parameters": [{

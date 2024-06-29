@@ -5,7 +5,7 @@ import pers.jie.karate.param.KarateSyntaxParam;
 
 import java.util.*;
 
-public class HandleParameters {
+public class ParametersHandler {
 
     public void handleOperationParameters(Map<String, String> requestData, StringBuilder karateScript, boolean isBackground) {
         String requestText = requestData.get("request_text");

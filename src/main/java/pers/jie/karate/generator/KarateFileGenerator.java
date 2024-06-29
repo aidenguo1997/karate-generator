@@ -17,11 +17,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 
-public class GeneratorKarateFile {
-    private final GeneratorScript generatorScript;
+public class KarateFileGenerator {
+    private final KarateElementGenerator karateElementGenerator;
 
-    public GeneratorKarateFile(GeneratorScript generatorScript) {
-        this.generatorScript = generatorScript;
+    public KarateFileGenerator(KarateElementGenerator karateElementGenerator) {
+        this.karateElementGenerator = karateElementGenerator;
     }
 
     public void convertGherkinToKarate(List<String> errors) {
@@ -62,8 +62,8 @@ public class GeneratorKarateFile {
 
     private StringBuilder generateKarateScript(OpenAPI openAPI, String gherkinContent, List<Map<String, String>> requestDataList, List<String> errors) {
         StringBuilder karateScript = new StringBuilder();
-        generatorScript.backgroundKarateScript(openAPI, gherkinContent, requestDataList, errors, karateScript);
-        generatorScript.scenarioKarateScript(openAPI, gherkinContent, requestDataList, errors, karateScript);
+        karateElementGenerator.backgroundKarateScript(openAPI, gherkinContent, requestDataList, errors, karateScript);
+        karateElementGenerator.scenarioKarateScript(openAPI, gherkinContent, requestDataList, errors, karateScript);
         return karateScript;
     }
 

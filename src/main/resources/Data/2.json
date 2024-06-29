@@ -4,10 +4,9 @@
     "method": "POST",
     "request_text": "username=zx123&password=zxc123321\nusername=jie123&password=zxc12321\nusername=qa123&password=zxc123321"
   },
-
   {
     "path": "/tmall/user/update",
     "method": "POST",
-    "request_text": "user_name=zx123&user_password=zxc123321&user_nickname=ee&user_birthday=2024-05-18&user_gender=0&user_address=110101\nuser_name=qa123&user_password=zxc123321&user_nickname=ww&user_birthday=2024-05-09&user_gender=0&user_address=110101"
+    "request_text": "user_realname=zx123&user_password=zxc123321&user_nickname=ee&user_birthday=2024-05-18&user_gender=0&user_address=110101\nuser_realname=qa123&user_password=zxc123321&user_nickname=ww&user_birthday=2024-05-09&user_gender=0&user_address=110101"
   }
 ]

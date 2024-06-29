@@ -2,18 +2,19 @@ package pers.jie.karate.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.swagger.v3.oas.models.PathItem;
 
 import java.util.*;
 
-public class HandleDataTables {
-    private final HandleRequestData requestData;
+public class DataTablesHandler {
+    private final RequestDataHandler requestData;
 
-    public HandleDataTables(HandleRequestData requestData) {
+    public DataTablesHandler(RequestDataHandler requestData) {
         this.requestData = requestData;
     }
 
-    public String handleOperationParametersTable(List<Map<String, String>> requestDataList, String path) {
-        Map<String, String> request = requestData.findMatchingRequestData(requestDataList, path);
+    public String handleOperationParametersTable(List<Map<String, String>> requestDataList, String path, PathItem.HttpMethod httpMethod) {
+        Map<String, String> request = requestData.findMatchingRequestData(requestDataList, path, httpMethod);
         if (request != null) {
             String requestText = request.get("request_text");
             boolean isJson = requestText.matches("^\\s*(\\{.*}|\\[.*])\\s*$");

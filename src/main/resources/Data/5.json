@@ -1,0 +1,32 @@
+[
+  {
+    "path": "/products",
+    "method": "GET",
+    "request_text": "\n\n\n\n\n\n"
+  },
+  {
+    "path": "/products",
+    "method": "POST",
+    "request_text": "[{\"name\": \"\\u9752\\u83dc\", \"price\": \"10\"}, {\"name\": \"\\u69b4\\u69e4\", \"price\": \"800\"}]"
+  },
+  {
+    "path": "/products/66521b82a9dc525c8495c4fa",
+    "method": "PUT",
+    "request_text": "{\"name\":\"青菜\",\"price\":\"15\"}"
+  },
+  {
+    "path": "/products/66521b90a9dc525c8495c4fb",
+    "method": "PUT",
+    "request_text": "{\"name\":\"榴槤\",\"price\":\"250\"}"
+  },
+  {
+    "path": "/products/66521b90a9dc525c8495c4fb",
+    "method": "DELETE",
+    "request_text": ""
+  },
+  {
+    "path": "/products/66521b82a9dc525c8495c4fa",
+    "method": "DELETE",
+    "request_text": ""
+  }
+]

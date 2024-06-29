@@ -1,0 +1,7 @@
+[
+  {
+    "path": "/SightAPI",
+    "method": "GET",
+    "request_text": "zone=七堵\nzone=中山\nzone=中正\nzone=仁愛\nzone=安樂\nzone=信義\nzone=暖暖"
+  }
+]
