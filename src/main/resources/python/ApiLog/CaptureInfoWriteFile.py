@@ -1,11 +1,11 @@
 import mitmproxy.http
 import json
 import os
-import argparse
 
 class CaptureInfoWriteFile:
     def __init__(self):
-        self.history_file = 'bookstoretest-production.up.railway.app.json'  # 指定历史请求文件名
+        path = os.path.abspath(os.path.join(os.getcwd(), "../.."))
+        self.history_file = path + '/Data/request.json'  # 指定历史请求文件名
         self.static_ext = ['js', 'css', 'ico', 'jpg', 'png', 'gif', 'jpeg', 'bmp', 'conf', 'html']
 
         # 如果历史请求文件不存在，则创建一个空文件
@@ -27,7 +27,7 @@ class CaptureInfoWriteFile:
             text = flow_request.text
         last_path = url.split('?')[0].split('/')[-1]
         
-        if flow_request.host != "bookstoretest-production.up.railway.app":
+        if flow_request.host != "tmall.up.railway.app":
             return
         
         if last_path.split('.')[-1] in self.static_ext:

@@ -15,7 +15,8 @@ Feature: Tmall Store
     Then status 200
     Examples:
       | user_address | user_birthday | user_gender | user_name | user_nickname | user_password |
-      | 140581 | 2023-12-05 | 0 | s5678 | bbb | zxc123321 |
+      | 140823 | 2024-01-30 | 1 | fg666 | %E8%91%89%E5%A4%A7%E5%93%A5 | zxc123 |
+      | 140823 | 2004-02-10 | 1 | xd666 | JJJ | zxc123 |
 
   Scenario Outline: Check Login
     Given path '/login/doLogin'
@@ -25,4 +26,5 @@ Feature: Tmall Store
     Then status 200
     Examples:
       | password | username |
-      | zxc123321 | s5678 |
+      | zxc123 | fg666 |
+      | zxc123 | xd666 |

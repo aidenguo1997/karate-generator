@@ -1,0 +1,142 @@
+[
+  {
+    "path": "/tmall/register",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/address/140000",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/address/140800",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/register/doRegister",
+    "method": "POST",
+    "request_text": "user_name=fg666&user_password=zxc123&user_nickname=%E8%91%89%E5%A4%A7%E5%93%A5&user_birthday=2024-01-30&user_gender=1&user_address=140823\nuser_name=xd666&user_password=zxc123&user_nickname=JJJ&user_birthday=2004-02-10&user_gender=1&user_address=140823"
+  },
+  {
+    "path": "/tmall/login",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/login/doLogin",
+    "method": "POST",
+    "request_text": "username=fg666&password=zxc123\nusername=xd666&password=zxc123"
+  },
+  {
+    "path": "/tmall",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/admin/login/profile_picture",
+    "method": "GET",
+    "request_text": "username=admin\nusername=admin\nusername=admin\nusername=admin"
+  },
+  {
+    "path": "/tmall/res/images/item/adminProfilePicture/undefined",
+    "method": "GET",
+    "request_text": "\n\n\n"
+  },
+  {
+    "path": "/tmall/admin/login/doLogin",
+    "method": "POST",
+    "request_text": "username=admin&password=admin\nusername=admin&password=admin\nusername=admin&password=admin"
+  },
+  {
+    "path": "/tmall/admin",
+    "method": "GET",
+    "request_text": "\n\n"
+  },
+  {
+    "path": "/tmall/res/images/item/adminProfilePicture/",
+    "method": "GET",
+    "request_text": "\n\n\n"
+  },
+  {
+    "path": "/tmall/admin/product",
+    "method": "GET",
+    "request_text": "\n\n"
+  },
+  {
+    "path": "/tmall/admin/product/new",
+    "method": "GET",
+    "request_text": "\n"
+  },
+  {
+    "path": "/tmall/admin/property/type/2",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/admin/product",
+    "method": "POST",
+    "request_text": "product_category_id=2&product_isEnabled=0&product_name=Test2&product_title=Test2&product_price=500&product_sale_price=200&propertyJson=%7B%7D\nproduct_category_id=4&product_isEnabled=0&product_name=Test3&product_title=Test3&product_price=4000&product_sale_price=1500&propertyJson=%7B%7D"
+  },
+  {
+    "path": "/tmall/admin/product/91",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/admin/category",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/admin/user",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/admin/order",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/admin/reward",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/admin/account",
+    "method": "GET",
+    "request_text": "\n"
+  },
+  {
+    "path": "/tmall/admin/account/4",
+    "method": "PUT",
+    "request_text": "admin_nickname=Aiden&admin_profile_picture_src=&admin_password=&admin_newPassword="
+  },
+  {
+    "path": "/tmall/admin/login",
+    "method": "GET",
+    "request_text": "\n\n"
+  },
+  {
+    "path": "/tmall/admin/account/logout",
+    "method": "GET",
+    "request_text": "\n"
+  },
+  {
+    "path": "/tmall/admin/property/type/4",
+    "method": "GET",
+    "request_text": ""
+  },
+  {
+    "path": "/tmall/admin/product/92",
+    "method": "GET",
+    "request_text": ""
+  }
+]

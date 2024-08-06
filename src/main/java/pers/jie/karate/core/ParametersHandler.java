@@ -45,6 +45,7 @@ public class ParametersHandler {
         Gson gson = new Gson();
         JsonArray jsonArray = gson.fromJson(jsonDataString, JsonArray.class);
         // 取第一个对象，构建结果对象
+
         return jsonArray.get(0).getAsJsonObject();
     }
 
